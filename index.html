@@ -1,14 +1,327 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Vercel</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Rockstar Games | Authentication</title>
+    
+    <!-- Fonte Premium: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Biblioteca de Ícones SVG (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* =========================================
+           Reset e Tema Moderno Dark
+           ========================================= */
+        :root {
+            --bg-color: #050505;
+            --card-bg: rgba(18, 18, 20, 0.8);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --gta-pink: #ff007f;
+            --gta-cyan: #00f2fe;
+            --gta-orange: #ff5e00;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* =========================================
+           Ambient Glow (Vibe Vice City)
+           Efeito sutil no fundo em vez de gradiente forte
+           ========================================= */
+        .ambient-glow {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .glow-pink {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(80px);
+        }
+
+        .glow-cyan {
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(80px);
+        }
+
+        /* =========================================
+           Card de Login Minimalista
+           ========================================= */
+        .login-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================
+           Logo Estruturada
+           ========================================= */
+        .brand {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .brand-title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--gta-pink), var(--gta-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 4px 12px rgba(255, 0, 127, 0.3));
+        }
+
+        /* =========================================
+           Formulário (Estilo Linear/Premium)
+           ========================================= */
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            width: 18px;
+            height: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 14px 14px 42px;
+            color: var(--text-main);
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Focus states interativos */
+        .input-container:focus-within .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 0, 127, 0.5);
+            box-shadow: 0 0 0 3px rgba(255, 0, 127, 0.1);
+        }
+
+        .input-container:focus-within .input-icon {
+            color: var(--gta-pink);
+        }
+
+        /* =========================================
+           Botões e Ações
+           ========================================= */
+        .btn-submit {
+            width: 100%;
+            background: var(--text-main);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-main);
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            background: var(--gta-pink);
+            color: white;
+            box-shadow: 0 8px 24px rgba(255, 0, 127, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .form-footer {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .form-footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .form-footer a:hover {
+            color: var(--text-main);
+        }
+    </style>
 </head>
 <body>
-    <h1>Olá</h1>
-    <h4>Teste</h4>
-    
+
+    <!-- Brilhos de fundo estáticos e otimizados -->
+    <div class="ambient-glow">
+        <div class="glow-pink"></div>
+        <div class="glow-cyan"></div>
+    </div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            
+            <div class="brand">
+                <span class="brand-subtitle">Grand Theft Auto</span>
+                <span class="brand-title">VI</span>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <div class="input-container">
+                        <i data-lucide="mail" class="input-icon"></i>
+                        <input type="email" id="email" class="form-control" placeholder="usuario@email.com" required autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-container">
+                        <i data-lucide="lock" class="input-icon"></i>
+                        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <span>Entrar</span>
+                    <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                </button>
+            </form>
+
+            <div class="form-footer">
+                <a href="#">Criar conta</a>
+                <a href="#">Esqueceu a senha?</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Inicializa os ícones do Lucide -->
+    <script>
+        lucide.createIcons();
+
+        // Evita reload na simulação do form
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.querySelector('.btn-submit span');
+            const icon = document.querySelector('.btn-submit i');
+            
+            btn.textContent = 'Autenticando...';
+            icon.setAttribute('data-lucide', 'loader');
+            icon.style.animation = 'spin 1s linear infinite';
+            lucide.createIcons();
+
+            setTimeout(() => {
+                btn.textContent = 'Acesso Liberado';
+                icon.setAttribute('data-lucide', 'check');
+                icon.style.animation = 'none';
+                document.querySelector('.btn-submit').style.background = '#00f2fe';
+                lucide.createIcons();
+            }, 1500);
+        });
+    </script>
+    <style>
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
 </body>
 </html>
